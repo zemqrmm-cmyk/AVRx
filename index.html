@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AR หลอดไฟ - Hiro Marker</title>
+
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+
+  <style>
+    body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
+    #controls {
+      position: fixed; bottom: 30px; left: 0; right: 0;
+      display: flex; justify-content: center; gap: 15px; z-index: 9999;
+    }
+    button {
+      border: none; border-radius: 12px; padding: 14px 30px;
+      font-size: 18px; font-weight: bold; color: white; cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    #onBtn { background: #28a745; }
+    #offBtn { background: #dc3545; }
+    button:active { transform: scale(0.95); }
+    #status {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      z-index: 9999; padding: 10px 20px; border-radius: 10px;
+      background: rgba(0,0,0,0.65); color: white; font-size: 16px;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="status">🔍 กำลังค้นหา Hiro Marker...</div>
+
+  <div id="controls">
+    <button id="onBtn">💡 เปิดไฟ</button>
+    <button id="offBtn">🔌 ปิดไฟ</button>
+  </div>
+
+  <a-scene
+    embedded
+    vr-mode-ui="enabled: false"
+    renderer="logarithmicDepthBuffer: true; colorManagement: true;"
+    arjs="sourceType: webcam; debugUIEnabled: false;">
+
+    <a-marker id="hiroMarker" preset="hiro">
+
+      <a-light id="bulbLight" type="point" color="#fff8b0" intensity="0"></a-light>
+
+      <a-entity id="bulb" position="0 0.9 0">
+        <a-cylinder position="0 -0.45 0" radius="0.18" height="0.25" color="#555555"></a-cylinder>
+
+        <a-torus
+          position="0 -0.35 0"
+          rotation="90 0 0"
+          radius="0.13"
+          radius-tubular="0.025"
+          color="#aaaaaa">
+        </a-torus>
+
+        <a-sphere
+          id="bulbGlass"
+          position="0 -0.05 0"
+          radius="0.28"
+          color="#666666"
+          opacity="0.9"
+          transparent="true">
+
+          <a-cylinder
+            id="filament"
+            position="0 0 0"
+            radius="0.035"
+            height="0.3"
+            color="#444444">
+          </a-cylinder>
+        </a-sphere>
+      </a-entity>
+
+    </a-marker>
+
+    <a-entity camera></a-entity>
+  </a-scene>
+
+  <script>
+    const marker = document.getElementById("hiroMarker");
+    const bulb = document.getElementById("bulb");
+    const bulbGlass = document.getElementById("bulbGlass");
+    const filament = document.getElementById("filament");
+    const bulbLight = document.getElementById("bulbLight");
+    const onBtn = document.getElementById("onBtn");
+    const offBtn = document.getElementById("offBtn");
+    const status = document.getElementById("status");
+
+    function turnOn() {
+      bulbGlass.setAttribute("color", "#fff3a3");
+      filament.setAttribute("color", "#ffff00");
+      bulbLight.setAttribute("intensity", "2");
+      status.innerHTML = "💡 เปิดไฟแล้ว";
+    }
+
+    function turnOff() {
+      bulbGlass.setAttribute("color", "#666666");
+      filament.setAttribute("color", "#444444");
+      bulbLight.setAttribute("intensity", "0");
+      status.innerHTML = "🔌 ปิดไฟแล้ว";
+    }
+
+    onBtn.addEventListener("click", turnOn);
+    offBtn.addEventListener("click", turnOff);
+
+    marker.addEventListener("markerFound", function () {
+      status.innerHTML = "✅ พบ Hiro Marker - หลอดไฟพร้อมใช้งาน";
+      bulb.setAttribute("visible", "true");
+    });
+
+    marker.addEventListener("markerLost", function () {
+      status.innerHTML = "🔍 กำลังค้นหา Hiro Marker...";
+    });
+
+    turnOff();
+  </script>
+</body>
+</html>
